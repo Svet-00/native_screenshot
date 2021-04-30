@@ -1,3 +1,9 @@
+
+## 1.1.0 - 30.04.2020
+### Added
+ - Ability to specify quality of the screenshot. On iOS it just influences image size. On Android lower quality also gains performance benefits.
+
+
 ## 1.0.0 - 04.04.2020
 ### Fixed
 - Null-safety added to the only method we have: `takeScreenshot()`.

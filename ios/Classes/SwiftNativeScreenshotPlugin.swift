@@ -37,11 +37,18 @@ public class SwiftNativeScreenshotPlugin: NSObject, FlutterPlugin {
 
         self.result = result
 
-        takeScreenshot(view: controller.view)
+        if let args = call.arguments as? Dictionary<String, Any>,
+            let quality = args["quality"] as? NSNumber {
+            takeScreenshot(view: controller.view, quality: quality)
+        } else {
+            result(FlutterError.init(code: "errorSetDebug", message: "data or format error", details: nil))
+        }
+
     } // handle()
 
-    func takeScreenshot(view: UIView, toImageGallery :Bool = true) {
-        let scale :CGFloat = UIScreen.main.scale
+    func takeScreenshot(view: UIView, quality: NSNumber) {
+        var scale :CGFloat = quality as! CGFloat
+        scale /= 100
 
         UIGraphicsBeginImageContextWithOptions(view.bounds.size, view.isOpaque, scale)
 

@@ -26,7 +26,10 @@ class _MyAppState extends State<MyApp> {
             ElevatedButton(
               child: Text('Press to capture screenshot'),
               onPressed: () async {
-                Uint8List? image = await NativeScreenshot.takeScreenshot();
+                final quality = 60;
+                final stopwatch = Stopwatch()..start();
+                Uint8List? image = await NativeScreenshot.takeScreenshot(quality: quality);
+                print('Screenshot with quality $quality% taken in ${stopwatch.elapsed.inMilliseconds} ms');
                 setState(() => _imageData = image);
 
                 if (image == null) {

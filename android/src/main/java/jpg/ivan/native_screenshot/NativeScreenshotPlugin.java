@@ -125,12 +125,13 @@ public class NativeScreenshotPlugin implements MethodCallHandler, FlutterPlugin,
             return;
         } // if not implemented
 
-        byte[] bytes = takeScreenshot();
+        int quality = call.argument("quality");
+        byte[] bytes = takeScreenshot(quality);
         result.success(bytes);
 
     } // onMethodCall()
 
-    private byte[] takeScreenshot() {
+    private byte[] takeScreenshot(int quality) {
         Log.println(Log.INFO, TAG, "Taking screenshot");
 
         try {
@@ -153,7 +154,11 @@ public class NativeScreenshotPlugin implements MethodCallHandler, FlutterPlugin,
             }
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+
+            int dstWidth = (int) (bitmap.getWidth() * quality / 100);
+            int dstHeight = (int) (bitmap.getHeight() * quality / 100);
+            Bitmap dstBitmap = Bitmap.createScaledBitmap(bitmap, dstWidth, dstHeight, false);
+            dstBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
             bitmap.recycle();
 
