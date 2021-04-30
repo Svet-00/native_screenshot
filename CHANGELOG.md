@@ -1,5 +1,8 @@
+## 1.2.0 - 30.04.2021
+### Changed
+ - `takeScreenshot` method now takes an instance of `ScreenshotConfig` which describes image quality and format.
 
-## 1.1.0 - 30.04.2020
+## 1.1.0 - 30.04.2021
 ### Added
  - Ability to specify quality of the screenshot. On iOS it just influences image size. On Android lower quality also gains performance benefits.
 

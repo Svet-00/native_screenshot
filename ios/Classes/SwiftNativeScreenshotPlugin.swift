@@ -38,22 +38,22 @@ public class SwiftNativeScreenshotPlugin: NSObject, FlutterPlugin {
         self.result = result
 
         if let args = call.arguments as? Dictionary<String, Any>,
-            let quality = args["quality"] as? NSNumber {
-            takeScreenshot(view: controller.view, quality: quality)
+            let quality = args["quality"] as? NSNumber ,
+            let format = args["format"] as? String {
+            takeScreenshot(view: controller.view, quality: quality, format: format)
         } else {
             result(FlutterError.init(code: "errorSetDebug", message: "data or format error", details: nil))
         }
 
     } // handle()
 
-    func takeScreenshot(view: UIView, quality: NSNumber) {
-        let scale :CGFloat = UIScreen.main.scale
-        let quality = (quality as! CGFloat) / 100
+    func takeScreenshot(view: UIView, quality: NSNumber, format: String) {
+        let scale: CGFloat = UIScreen.main.scale
 
         UIGraphicsBeginImageContextWithOptions(view.bounds.size, view.isOpaque, scale)
 
         view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
-        let optionalImage :UIImage? = UIGraphicsGetImageFromCurrentImageContext()
+        let optionalImage: UIImage? = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
 
         guard let image = optionalImage else {
@@ -61,8 +61,18 @@ public class SwiftNativeScreenshotPlugin: NSObject, FlutterPlugin {
             return
         } // guard no image
 
-        let data = FlutterStandardTypedData(bytes: image.jpegData(compressionQuality: quality)!)
-        result(data)
-
+        if (format == "jpeg"){
+            NSLog("[Native Screenshot iOS] Taking screenshot in jpeg format with quality \(quality)")
+            let q = (quality as! CGFloat) / 100
+            let data = FlutterStandardTypedData(bytes: image.jpegData(compressionQuality: q)!)
+            result(data)
+        } else if (format == "png"){
+            NSLog("[Native Screenshot iOS] Taking screenshot in png format")
+            let data = FlutterStandardTypedData(bytes: image.pngData()!)
+            result(data)
+        } else {
+            NSLog("[Native Screenshot iOS] Unsupported image format: \(format)")
+            result(nil)
+        }
     } // takeScreenshot()
 } // SwiftNativeScreenshotPlugin

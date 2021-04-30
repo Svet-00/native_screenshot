@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
@@ -15,16 +16,62 @@ class NativeScreenshot {
   ///
   /// Returns [null] if an error occurs.
   /// Returns a [Uint8List] with the image data.
-  static Future<Uint8List?> takeScreenshot({int quality = 100}) async {
-    assert(quality >= 0, 'Can not take screenshot with negative quality');
-    assert(quality <= 100, 'Can not take screenshot with quality greater than 100');
+  static Future<Uint8List?> takeScreenshot({
+    ScreenshotConfig config = ScreenshotConfig.png,
+  }) async {
+    if (config.format == ScreenshotFormat.png && config.quality != 100) {
+      log('[NativeScreenshot] WARNING compressionQuality has no effect when screenshotFormat is png.');
+    }
+
     final Uint8List? image = await _channel.invokeMethod(
       'takeScreenshot',
       <String, dynamic>{
-        'quality': quality,
+        'quality': config.quality,
+        'format': config.format.toStringX(),
       },
     );
 
     return image;
   } // takeScreenshot()
 } // NativeScreenshot
+
+class ScreenshotConfig {
+  const ScreenshotConfig({
+    this.quality = 100,
+    this.format = ScreenshotFormat.jpeg,
+  })  : assert(quality >= 0, 'Compression quality can\'t be negative.'),
+        assert(quality <= 100, 'Compression quality can\'t be greater than 100.');
+
+  /// Compression quality in percents. Valid range is 0 - 100.
+  ///
+  /// This Only have impact when [format] is [ScreenshotFormat.jpeg]
+  final int quality;
+
+  /// Format used for encoding image data.
+  final ScreenshotFormat format;
+
+  static const png = ScreenshotConfig(quality: 100, format: ScreenshotFormat.png);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is ScreenshotConfig && other.quality == quality && other.format == format;
+  }
+
+  @override
+  int get hashCode => quality.hashCode ^ format.hashCode;
+}
+
+enum ScreenshotFormat { png, jpeg }
+
+extension ScreenshotFormatX on ScreenshotFormat {
+  String toStringX() {
+    switch (this) {
+      case ScreenshotFormat.png:
+        return 'png';
+      case ScreenshotFormat.jpeg:
+        return 'jpeg';
+    }
+  }
+}

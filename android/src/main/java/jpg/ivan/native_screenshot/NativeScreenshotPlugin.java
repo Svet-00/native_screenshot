@@ -120,19 +120,20 @@ public class NativeScreenshotPlugin implements MethodCallHandler, FlutterPlugin,
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         if (!call.method.equals("takeScreenshot")) {
-            Log.println(Log.INFO, TAG, "Method not implemented!");
+            Log.w(TAG, "[Native Screenshot Android] Method not implemented!");
             result.notImplemented();
             return;
         } // if not implemented
 
         int quality = call.argument("quality");
-        byte[] bytes = takeScreenshot(quality);
+        String format = call.argument("format");
+        byte[] bytes = takeScreenshot(quality, format);
         result.success(bytes);
 
     } // onMethodCall()
 
-    private byte[] takeScreenshot(int quality) {
-        Log.println(Log.INFO, TAG, "Taking screenshot");
+    private byte[] takeScreenshot(int quality, String format) {
+        Log.i(TAG, "[Native Screenshot Android] Taking screenshot");
 
         try {
             View view = this.activity.getWindow().getDecorView().getRootView();
@@ -149,24 +150,28 @@ public class NativeScreenshotPlugin implements MethodCallHandler, FlutterPlugin,
             view.setDrawingCacheEnabled(false);
 
             if (bitmap == null) {
-                Log.println(Log.INFO, TAG, "The bitmap cannot be created :(");
+                Log.w(TAG, "[Native Screenshot Android] The bitmap cannot be created");
                 return null;
             }
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-            // int dstWidth = (int) (bitmap.getWidth() * quality / 100);
-            // int dstHeight = (int) (bitmap.getHeight() * quality / 100);
-            // Bitmap dstBitmap = Bitmap.createScaledBitmap(bitmap, dstWidth, dstHeight,
-            // false);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
+            if (format.equals("jpeg")) {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
+            } else if (format.equals("png")) {
+                bitmap.compress(Bitmap.CompressFormat.PNG, quality, stream);
+            } else {
+                Log.w(TAG, "[Native Screenshot Android] Unsupported screenshot format: " + format);
+                return null;
+            }
+
             byte[] byteArray = stream.toByteArray();
             bitmap.recycle();
 
             return byteArray;
 
         } catch (Exception ex) {
-            Log.println(Log.INFO, TAG, "Error taking screenshot: " + ex.getMessage());
+            Log.w(TAG, "[Native Screenshot Android] Error taking screenshot: " + ex.getMessage());
         }
         return null;
     }
