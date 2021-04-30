@@ -155,10 +155,11 @@ public class NativeScreenshotPlugin implements MethodCallHandler, FlutterPlugin,
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-            int dstWidth = (int) (bitmap.getWidth() * quality / 100);
-            int dstHeight = (int) (bitmap.getHeight() * quality / 100);
-            Bitmap dstBitmap = Bitmap.createScaledBitmap(bitmap, dstWidth, dstHeight, false);
-            dstBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            // int dstWidth = (int) (bitmap.getWidth() * quality / 100);
+            // int dstHeight = (int) (bitmap.getHeight() * quality / 100);
+            // Bitmap dstBitmap = Bitmap.createScaledBitmap(bitmap, dstWidth, dstHeight,
+            // false);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
             byte[] byteArray = stream.toByteArray();
             bitmap.recycle();
 

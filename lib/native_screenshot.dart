@@ -16,7 +16,7 @@ class NativeScreenshot {
   /// Returns [null] if an error occurs.
   /// Returns a [Uint8List] with the image data.
   static Future<Uint8List?> takeScreenshot({int quality = 100}) async {
-    assert(quality > 0, 'Can not take screenshot with zero quality');
+    assert(quality >= 0, 'Can not take screenshot with negative quality');
     assert(quality <= 100, 'Can not take screenshot with quality greater than 100');
     final Uint8List? image = await _channel.invokeMethod(
       'takeScreenshot',

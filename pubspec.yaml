@@ -1,6 +1,6 @@
 name: native_screenshot
 description: A simple plugin to take screenshots using native code (iOS & Android).
-version: 1.1.0
+version: 1.1.1
 publish_to: none
 
 environment:

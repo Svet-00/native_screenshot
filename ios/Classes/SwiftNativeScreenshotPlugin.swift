@@ -47,8 +47,8 @@ public class SwiftNativeScreenshotPlugin: NSObject, FlutterPlugin {
     } // handle()
 
     func takeScreenshot(view: UIView, quality: NSNumber) {
-        var scale :CGFloat = quality as! CGFloat
-        scale /= 100
+        let scale :CGFloat = UIScreen.main.scale
+        let quality = (quality as! CGFloat) / 100
 
         UIGraphicsBeginImageContextWithOptions(view.bounds.size, view.isOpaque, scale)
 
@@ -61,7 +61,7 @@ public class SwiftNativeScreenshotPlugin: NSObject, FlutterPlugin {
             return
         } // guard no image
 
-        let data = FlutterStandardTypedData(bytes: image.pngData()!)
+        let data = FlutterStandardTypedData(bytes: image.jpegData(compressionQuality: quality)!)
         result(data)
 
     } // takeScreenshot()
